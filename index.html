@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עוד מ"ט אתם בשחמט</title>
+    <link rel="icon" href="c.jpg" type="image/x-icon">
+    <style>
+        body {
+            direction: rtl;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url(chess4.jpg);
+            /* תמונת רקע מתאימה לשחמט */
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-rows: repeat(8, auto);
+            /* כל שורה תהיה בגובה אוטומטי */
+            grid-gap: 15px;
+            max-width: 1000px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow-y: auto;
+            height: 90vh;
+            margin-bottom: 50px;
+        }
+
+        .week {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .day-card {
+            position: relative;
+            width: 100px;
+            height: 150px;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 10px;
+            color: black;
+        }
+
+        .date {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #f39c12;
+            /* צבע הזהב לתאריך */
+        }
+
+        .message {
+            position: absolute;
+            bottom: 0;
+            font-size: 14px;
+            visibility: hidden;
+            text-align: right;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .day-card>img {
+
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            /* Ensure the image is on top */
+            border-radius: 10px;
+        }
+
+        .bg {
+            opacity: 0.3;
+        }
+
+        .shabat {
+            position: absolute;
+        }
+
+        .day-card>h2 {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            margin: 0;
+            z-index: 2;
+            font-family: 'Times New Roman', serif;
+            /* גופן יפה */
+            color: #f39c12;
+            /* צבע זהב */
+        }
+
+        .day-card.revealed .message {
+            visibility: visible;
+        }
+
+        .title {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f39c12;
+        }
+
+        .last-day {
+
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #FFD700;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* width: 550px; */
+            /* max-width: 1000px; */
+            /* height: 500px; */
+            /* max-height: 800px; */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            background-image: url("end.jpg");
+            background-size: cover;
+            margin-bottom: 200px;
+            width: 800px;
+            height: 800px;
+        }
+
+        .last-day h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: #333;
+        }
+
+        .last-day p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .last-day img {
+
+            margin-top: 20px;
+        }
+
+        .scratch-off {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .week1 {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6KLLVDK5G6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6KLLVDK5G6');
+    </script>
+</head>
+
+<body>
+    <h1 class="title">בעוד מ"ט אתם ב<span style="color: black; font-size: 48px;">ש</span><span
+            style="color: white; font-size: 50px;">ח</span><span style="color: black; font-size: 45px;">מ</span><span
+            style="color: white; font-size: 53px;">ט</span> הוא ב<span
+            style="color: black; font-size: 55px;">שחור</span> את ב<span
+            style="color: whitesmoke; font-size: 55px;">לבן</span> ומתחילים את המהלך</h1>
+    <h2>כל יום יש לגרד את הכרטיס ביום המתאים, בלי לדלג!!!</h2>
+    <div class="calendar">
+        <!-- Week 1 -->
+        <div class="week1">
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        שבע שבתות שבתות תמימות
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        לעולם אל תסתכל על אדם מלמעלה
+                        אלא אם אתה עוזר לו לקום.</div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אנשים גדולים תמיד יתנו לך את
+                        ההרגשה שגם אתה מסוגל להיות
+                        גדול </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        בשביל להיות 'עושה שלום' חייבים ללכת
+                        3 פסיעות אחורה ולהתכופף גם לימין
+                        וגם לשמאל
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 2 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אשת חיל מי ימצא הוא יכול לשיר את יכולה ליישם </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        לא מתחתנים עם מי שאפשר לחיות אתו ,מתחתנים עם מי שאי אפשר לחיות בלעדיו
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        האדם הגבוה ביותר הוא זה
+                        המסוגל להתכופף לנמוך ביותר
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אושר הוא הדבר היחיד שמכפיל את עצמו כשמחלקים אותו לשניים.
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אם תדעי להנות מהדברים הקטנים
+                        בחיים, במבט לאחור תגלי כי היו אלו
+                        דברים גדולים מאוד. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        ארבעים יום מהיום וזה קורה
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 3 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חכם אומר 'אני יכול להיות טוב יותר',
+                        כושל אומר 'יש גרועים ממני' </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חכם טועה ואמר 'טעיתי', כושל טועה
+                        ואומר 'לא הייתי אשם </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        מצליח מסביר, כושל מתרץ </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חכם- ראשי תיבות חצי כוס מלאה </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        הכסיל אומר מה שהוא יודע,
+                        החכם יודע מה שהוא אומר 
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        עוד ל"ג מהיום
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 4 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אם אישה מצפה מבעלה שיתנהג כמו מלאך... קודם עליה ליצור לו בבית גן עדן..
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        מתחמם, מתחמם, עוד חודש!!!
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אדם נמצא במקום בו מחשבותיו נמצאות
+                        - וודא שמחשבותיך נמצאות במקום בו
+                        אתה רוצה להיות </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אם אתה יכול לחלום את זה, אתה
+                        יכול גם לעשות את זה </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        החולם על המחר מאבד את היום
+                        אשר עליו חלם אתמול. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        מי שלא חולם להיות גנרל- חייל
+                        פשוט לא יהיה </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 5 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חיוך הוא דרך זולה לשפר את
+                        המראה שלך. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        תמיד זכרי לחייך לחיים, ובכך החיים יחייכו אלייך!
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חיוך עולה פחות מחשמל ומביא
+                        יותר אור </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        מתוך שמחה, נעשית העבודה ביתר
+                        הצלחה וביתר מהירות, ובהרחבה
+                        והגדלה יתירה </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אנחנו יכולים להתלונן שלוורדים יש קוצים,
+                        או אנחנו יכולים לשמוח שבין הקוצים יש
+                        ורדים
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        כל יום חדש שמפציע הוא מתנה מאלוקים לאדם
+                        מה שאדם עושה איתו זו מתנה מאדם לאלוקים </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                        משפט יפה 36
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 6 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        הצלחה מביאה חברים, הכשלון
+                        בוחן אותם </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        חבר מזויף יעזור לך לקום כשנפלת
+                        חבר אמיתי לא יתן לך ליפול. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        העולם מלא באנשים נחמדים. אם אתה לא יכול למצוא אחד, תהיה אחד
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        עוד שבועיים
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        ידיד אמת הוא מי שסר אליך
+                        כשכל העולם סר ממך </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        בחפצים משתמשים וחברים אוהבים,
+                        לא להיפך </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                        משפט יפה 43
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 7 -->
+        <div class="week">
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        אם מאמינים בחסדו יתברך - אין קושיות.
+                        ואם לא מאמינים - אין תירוצים </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        לפעמים כשכבר קשה לנו ואנחנו לא יכולים
+                        להמשיך יותר, אנחנו צריכים לזכור שאמונה
+                        פירושה לתת לבורא עולם לקחת שליטה </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        לפעמים החיים מפרידים בין
+                        אנשים רק בכדי שיבינו כמה הם
+                        חשובים אחד לשני </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        עוד שבע לזוג מעל הטבע
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        למי שיש אמונה - אין שאלות,
+                        ולמי שחסרה אמונה - אין תשובות. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        שבת האחרונה רווקה
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img class="shabat" src="shabat.jpg" alt="Shabat Image" style="width: 100%; height: auto;">
+                    <img class="shabat" src="shabat.gif" alt="Shabat Image" style="width: 100%; height: 100%;">
+                    <div class="message">
+                        משפט יפה 44
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Week 8 -->
+        <div class="week">
+          
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        תקווה היא לרצות שמשהו יקרה
+                        אמונה היא לדעת שמשהו יקרה
+                        אומץ הוא לגרום למשהו לקרות. </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+            <div>
+                <div class="date"></div>
+                <div class="day-card">
+                    <img src="www.jpg" class="bg" alt="Bride Image" style="width: 100%; height: auto;">
+                    <div class="message">
+                        מחר זה קורה--- איתך בצפייה, בהתרגשות ובתפילה
+                    </div>
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <!-- יום אחרון -->
+            <div class="last-day">
+                <div class="scratch-off">
+                    <canvas id="scratchCanvas" width="500" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.day-card').forEach(card => {
+            const canvas = card.querySelector('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = card.offsetWidth;
+            canvas.height = card.offsetHeight;
+
+            // Fill canvas with scratch-off color
+            ctx.fillStyle = 'silver';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let isDrawing = false;
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                draw(e);
+            });
+
+            canvas.addEventListener('mousemove', draw);
+
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+                checkScratchCompletion(card, canvas);
+            });
+
+            canvas.addEventListener('mouseout', () => {
+                isDrawing = false;
+            });
+
+            function draw(e) {
+                if (!isDrawing) return;
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 20;
+                ctx.lineCap = 'round';
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+            function checkScratchCompletion(card, canvas) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let totalPixels = imageData.data.length / 4;
+                let transparentPixels = 0;
+
+                for (let i = 3; i < imageData.data.length; i += 4) {
+                    if (imageData.data[i] === 0) {
+                        transparentPixels++;
+                    }
+                }
+
+                if (transparentPixels > totalPixels * 0.2) {
+                    canvas.style.display = 'none';
+                    card.classList.add('revealed');
+                }
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var canvas = document.getElementById('scratchCanvas');
+            var ctx = canvas.getContext('2d');
+
+            // קביעת גודל ה-canvas לגודל הדיב שמכיל אותו
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            // מילוי השכבה באפור
+            ctx.fillStyle = '#C0C0C0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // הגדרת תכונות המברשת
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = 25;
+
+            var isDrawing = false;
+
+            canvas.addEventListener('mousedown', function (e) {
+                isDrawing = true;
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
+
+            canvas.addEventListener('mousemove', function (e) {
+                if (isDrawing) {
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+            });
+
+            canvas.addEventListener('mouseup', function () {
+                isDrawing = false;
+            });
+
+            canvas.addEventListener('mouseleave', function () {
+                isDrawing = false;
+            });
+        });
+
+    </script>
+
+    <script>
+        // מערך של תאריכים
+        dates = ["י\"ד טבת", "ט\"ו טבת", "ט\"ז טבת", "י\"ז טבת", "י\"ח טבת", "י\"ט טבת", "כ' טבת",
+         "כ\"א טבת", "כ\"ב טבת", "כ\"ג טבת", "כ\"ד טבת", "כ\"ה טבת", "כ\"ו טבת", "כ\"ז טבת", "כ\"ח טבת", "כ\"ט טבת",
+         "א' שבט", "ב' שבט", "ג' שבט", "ד' שבט", "ה' שבט", "ו' שבט", "ז' שבט", "ח' שבט", "ט' שבט", "י' שבט",
+         "י\"א שבט", "י\"ב שבט", "י\"ג שבט", "י\"ד שבט", "ט\"ו שבט", "ט\"ז שבט", "י\"ז שבט", "י\"ח שבט", "י\"ט שבט", "כ' שבט",
+         "כ\"א שבט", "כ\"ב שבט", "כ\"ג שבט", "כ\"ד שבט", "כ\"ה שבט", "כ\"ו שבט", "כ\"ז שבט", "כ\"ח שבט", "כ\"ט שבט", "ל' שבט",
+         "א' אדר", "ב' אדר", "ג' אדר", "ד' אדר"]
+
+        document.querySelectorAll('.date').forEach((card, index) => {
+            if (dates[index]) {
+                card.textContent = dates[index];
+            }
+
+        });
+    </script>
+</body>
+
+</html>
